@@ -1,6 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp"
+    android:minWidth="480dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/compressed_image_message"/>
+
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:gravity="center">
+
+        <TextView android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Size"
+            android:layout_marginRight="8dp"/>
+
+        <EditText android:id="@+id/et_height"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="720"/>
+
+        <TextView android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="x"/>
+
+        <EditText android:id="@+id/et_width"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="1280"/>
+
+    </TableRow>
+
+    <TableRow android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Quality"/>
+
+        <SeekBar
+            android:id="@+id/seekbar_quality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="80"
+            android:layout_weight="1"/>
+
+        <TextView android:id="@+id/tv_quality"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Quality: 80"/>
+
+    </TableRow>
+
+
+    <TableRow
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:gravity="end|right">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Cancel"
+            android:gravity="center"
+            android:layout_gravity="right|end"
+            android:onClick="cancel"
+            style="@style/Base.Widget.AppCompat.Button.Borderless" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Compress"
+            android:gravity="center"
+            android:layout_gravity="right|end"
+            android:onClick="compress"
+            style="@style/Base.Widget.AppCompat.Button.Borderless" />
+
+    </TableRow>
+
 
 </LinearLayout>
