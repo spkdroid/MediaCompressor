@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">ImageCompressor</string>
+    <string name="compressed_image_message">The compressed Image will be saved in the same directory
+        as the original image with \'compressed\' appended to the start of its name</string>
+    <string name="compress_image">Compress Image</string>
+</resources>
