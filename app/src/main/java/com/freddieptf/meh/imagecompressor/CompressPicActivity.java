@@ -1,9 +1,10 @@
 package com.freddieptf.meh.imagecompressor;
 
-import android.app.NotificationManager;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -26,10 +27,13 @@ public class CompressPicActivity extends AppCompatActivity {
     SeekBar seekBar;
     TextView tvQuality;
     float factor;
-    BitmapFactory.Options options;
     HeightTextWatcher heightTextWatcher;
     WidthTextWatcher widthTextWatcher;
     String picPath;
+    private int outWidth            = -1;
+    private int outHeight           = -1;
+    private final String OUT_WIDTH  = "ot";
+    private final String OUT_HEIGHT = "oh";
     private static final String TAG = "DialogActivity";
 
     @Override
@@ -42,24 +46,54 @@ public class CompressPicActivity extends AppCompatActivity {
         seekBar = (SeekBar) findViewById(R.id.seekbar_quality);
         tvQuality = (TextView) findViewById(R.id.tv_quality);
 
-        picPath = getIntent().getStringExtra(CompressService.PIC_PATH);
+        if(savedInstanceState != null && savedInstanceState.containsKey(CompressService.PIC_PATH)){
+            picPath = savedInstanceState.getString(CompressService.PIC_PATH);
+            outWidth = savedInstanceState.getInt(OUT_WIDTH);
+            outHeight = savedInstanceState.getInt(OUT_HEIGHT);
+        }else {
+            picPath = "";
+            init(getIntent());
+        }
 
-        options = new BitmapFactory.Options();
+    }
+
+    private void init(Intent intent) {
+        picPath = intent.getStringExtra(CompressService.PIC_PATH);
+        Log.d(TAG, "init: " + picPath);
+        BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(picPath, options);
-
-        height.setText(options.outHeight + "");
-        width.setText(options.outWidth + "");
-
+        BitmapFactory.decodeFile(picPath, options); //different thread..maybe?
+        outWidth = options.outWidth;
+        outHeight = options.outHeight;
+        height.setText(outHeight + "");
+        width.setText(outWidth + "");
         factor = (float) options.outHeight / (float) options.outWidth;
         linkHeightWidth();
         initSeekBar();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, "onNewIntent: " + intent.getStringExtra(CompressService.PIC_PATH));
+        init(intent);
+        setIntent(intent);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(!picPath.isEmpty()){
+            outState.putString(CompressService.PIC_PATH, picPath);
+            outState.putInt(OUT_WIDTH, outWidth);
+            outState.putInt(OUT_HEIGHT, outHeight);
+        }
 
     }
 
     private void linkHeightWidth(){
         heightTextWatcher = new HeightTextWatcher();
-        height.addTextChangedListener(heightTextWatcher);
+//        height.addTextChangedListener(heightTextWatcher);
         widthTextWatcher = new WidthTextWatcher();
         width.addTextChangedListener(widthTextWatcher);
     }
@@ -132,24 +166,25 @@ public class CompressPicActivity extends AppCompatActivity {
                 height.setText((int)(d * factor) + "");
             }else height.setText("");
 
-            height.addTextChangedListener(heightTextWatcher);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    height.addTextChangedListener(heightTextWatcher);
+                }
+            }, 1);
         }
     }
 
     public void cancel(View view){
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(CompressService.NOTIFICATION_ID);
         finish();
     }
 
     public void compress(View view){
-        Log.d(TAG, "Compress");
         new compress(Integer.parseInt(width.getText().toString()),
                 Integer.parseInt(height.getText().toString()), seekBar.getProgress()).execute();
     }
 
-    private class compress extends AsyncTask<Void, Void, Void>
-    {
+    private class compress extends AsyncTask<Void, Void, Void> {
         int targetWidth;
         int targetHeight;
         int quality;
@@ -161,8 +196,8 @@ public class CompressPicActivity extends AppCompatActivity {
         }
         @Override
         protected Void doInBackground(Void... params) {
-            options.inSampleSize = Math.min(options.outWidth/targetWidth, options.outHeight/targetHeight);
-            options.inJustDecodeBounds = false;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = Math.min(outWidth/targetWidth, outHeight/targetHeight);
             CompressUtils.compressPic(new File(picPath), options, quality, targetWidth, targetHeight);
             return null;
         }
