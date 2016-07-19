@@ -22,7 +22,6 @@ public class CompressService extends Service {
     public static final String ACTION_STOP     = "action_stop";
     public static final int NOTIFICATION_ID    = 232;
     NotificationManager notificationManager;
-    NotificationCompat.Builder builder;
     NotificationCompat.BigPictureStyle bigPictureStyle;
     private static final String TAG = "CompressService";
     String picPath;
@@ -31,7 +30,7 @@ public class CompressService extends Service {
     public void onCreate() {
         super.onCreate();
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        builder = new NotificationCompat.Builder(this);
+        picPath = "";
     }
 
     @Nullable
@@ -43,7 +42,7 @@ public class CompressService extends Service {
     @Override
     public int onStartCommand(Intent i, int flags, int startId) {
         Log.d(TAG, "onStartCommand: " + startId);
-
+        notificationManager.cancel(NOTIFICATION_ID);
         if(i.getAction() == null){
             init(i);
         }else {
@@ -51,24 +50,25 @@ public class CompressService extends Service {
                 sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)); //close the notifications drawer
                 Intent intentDialogActivty = new Intent(this, CompressPicActivity.class);
                 intentDialogActivty.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Log.d(TAG, ACTION_COMPRESS + ": " + picPath);
                 intentDialogActivty.putExtra(PIC_PATH, picPath);
                 startActivity(intentDialogActivty);
-            }else if(i.getAction().equals(ACTION_STOP)){
-                Log.d(TAG, "STOP");
-                this.stopService(new Intent(this, CompressService.class));
             }
+            Log.d(TAG, "STOP");
+            this.stopService(new Intent(this, CompressService.class)); //stop the service when after any of our actions is consumed
         }
 
         return START_NOT_STICKY;
     }
 
     private void init(Intent intent) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setContentTitle("Image Compressor")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentText("Expand to view compress options");
 
         bigPictureStyle = new NotificationCompat.BigPictureStyle(builder);
-        bigPictureStyle.bigPicture(getBitMapForNotification(Uri.parse(intent.getStringExtra(PIC_URI))));
+        bigPictureStyle.bigPicture(getBitMapForNotification(Uri.parse(intent.getStringExtra(PIC_URI)), builder));
         bigPictureStyle.setSummaryText("Compress this image?");
 
         Intent intentCompress = new Intent(this, CompressService.class);
@@ -87,7 +87,7 @@ public class CompressService extends Service {
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    public Bitmap getBitMapForNotification(Uri picUri){
+    public Bitmap getBitMapForNotification(Uri picUri, NotificationCompat.Builder builder){
         picPath = MainActivity.getPicPathFromPicUri(getBaseContext(), picUri);
         Log.d(TAG, "PIC_PATH: " + picPath);
         builder.setLargeIcon(CompressUtils.scaleImageForPreview(picPath, 100));
