@@ -22,9 +22,10 @@
         <activity android:name=".CompressPicActivity"
             android:label="@string/compress_image"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleTask" />
 
-        <service android:name=".CompressService"/>
+        <service android:name=".CompressService"
+            android:process=":compressService"/>
 
         <receiver android:name=".CameraActionReceiver">
             <intent-filter>
