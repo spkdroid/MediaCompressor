@@ -1,17 +1,19 @@
 package com.freddieptf.meh.imagecompressor;
 
 import android.app.NotificationManager;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -23,8 +25,8 @@ public class CompressPicActivity extends AppCompatActivity {
     EditText height, width;
     SeekBar seekBar;
     TextView tvQuality;
-    Bitmap bitmap;
     float factor;
+    BitmapFactory.Options options;
     HeightTextWatcher heightTextWatcher;
     WidthTextWatcher widthTextWatcher;
     String picPath;
@@ -41,16 +43,17 @@ public class CompressPicActivity extends AppCompatActivity {
         tvQuality = (TextView) findViewById(R.id.tv_quality);
 
         picPath = getIntent().getStringExtra(CompressService.PIC_PATH);
-        bitmap = BitmapFactory.decodeFile(picPath);
 
-        if(bitmap != null){
-            height.setText(bitmap.getHeight() + "");
-            width.setText(bitmap.getWidth() + "");
+        options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(picPath, options);
 
-            factor = (float) bitmap.getHeight()/(float) bitmap.getWidth();
-            linkHeightWidth();
-            initSeekBar();
-        }
+        height.setText(options.outHeight + "");
+        width.setText(options.outWidth + "");
+
+        factor = (float) options.outHeight / (float) options.outWidth;
+        linkHeightWidth();
+        initSeekBar();
 
     }
 
@@ -65,7 +68,7 @@ public class CompressPicActivity extends AppCompatActivity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tvQuality.setText("Quality:" + progress + "%");
+                tvQuality.setText("Quality: " + progress + "%");
             }
 
             @Override
@@ -140,9 +143,34 @@ public class CompressPicActivity extends AppCompatActivity {
     }
 
     public void compress(View view){
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.outHeight = Integer.parseInt(height.getText().toString());
-        options.outWidth = Integer.parseInt(width.getText().toString());
-        CompressUtils.compressPic(new File(picPath), options, seekBar.getProgress());
+        Log.d(TAG, "Compress");
+        new compress(Integer.parseInt(width.getText().toString()),
+                Integer.parseInt(height.getText().toString()), seekBar.getProgress()).execute();
+    }
+
+    private class compress extends AsyncTask<Void, Void, Void>
+    {
+        int targetWidth;
+        int targetHeight;
+        int quality;
+
+        public compress(int targetHidth, int targetHeight, int quality){
+            this.targetHeight = targetHeight;
+            this.targetWidth = targetHidth;
+            this.quality = quality;
+        }
+        @Override
+        protected Void doInBackground(Void... params) {
+            options.inSampleSize = Math.min(options.outWidth/targetWidth, options.outHeight/targetHeight);
+            options.inJustDecodeBounds = false;
+            CompressUtils.compressPic(new File(picPath), options, quality, targetWidth, targetHeight);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(CompressPicActivity.this, "Compression/Resizing done", Toast.LENGTH_SHORT).show();
+        }
     }
 }

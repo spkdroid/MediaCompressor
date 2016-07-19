@@ -12,14 +12,18 @@ import java.io.IOException;
  * Created by freddieptf on 18/07/16.
  */
 public class CompressUtils {
+    private static final String TAG = "CompressUtils";
 
-    public static void compressPic(File picture, BitmapFactory.Options options, int quality){
+    public static void compressPic(File picture, BitmapFactory.Options options, int quality,
+                                   int desWidth, int desHeight){
         try {
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(picture), null, options);
+            bitmap = Bitmap.createScaledBitmap(bitmap, desWidth, desHeight, false);
             FileOutputStream outputStream = new FileOutputStream(picture.getParent() + "/compressed_" + picture.getName());
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             outputStream.close();
             System.gc();
+            bitmap.recycle();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,7 +39,6 @@ public class CompressUtils {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(picPath, o);
-
         // Find the correct scale value. It should be the power of 2.
         int scale = 1;
         while(o.outWidth / scale / 2 >= REQUIRED_SIZE && o.outHeight / scale / 2 >= REQUIRED_SIZE) {
