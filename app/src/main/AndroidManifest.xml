@@ -30,8 +30,10 @@
         <receiver android:name=".CameraActionReceiver">
             <intent-filter>
                 <action android:name="android.hardware.action.NEW_PICTURE" />
+                <action android:name="android.hardware.action.NEW_VIDEO"/>
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="image/*" />
+                <data android:mimeType="image/*"/>
+                <data android:mimeType="video/*"/>
             </intent-filter>
         </receiver>
     </application>
