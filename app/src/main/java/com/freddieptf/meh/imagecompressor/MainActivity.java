@@ -11,24 +11,24 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
     final int IMAGE_REQUEST_CODE        = 13;
     final int STORAGE_PERMISION_REQUEST = 101;
-    String picturePath                  = "";
     private static final String TAG     = "MainActivity";
-    ImageView imagePreview;
     Button compressBtn, chooseButton;
     TextView fileSize, filePath;
-    File pictureFile;
+    String[] picturePaths;
+    RecyclerView recyclerView;
+    ImagePreviewAdapter previewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,24 +36,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         chooseButton = (Button) findViewById(R.id.btnChooser);
-        compressBtn = (Button) findViewById(R.id.btnCompress);
-        imagePreview = (ImageView) findViewById(R.id.imagePreview);
-        filePath = (TextView) findViewById(R.id.tv_filePath);
-        fileSize = (TextView) findViewById(R.id.tv_fileSize);
+        compressBtn  = (Button) findViewById(R.id.btnCompress);
+        filePath     = (TextView) findViewById(R.id.tv_filePath);
+        fileSize     = (TextView) findViewById(R.id.tv_fileSize);
+        recyclerView = (RecyclerView) findViewById(R.id.previewRecycler);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerView.hasFixedSize();
+        previewAdapter = new ImagePreviewAdapter();
+        previewAdapter.setClickListener(new ImagePreviewAdapter.ImageClickListener() {
+            @Override
+            public void onImageClick(String picPath) {
+            }
+        });
+        recyclerView.setAdapter(previewAdapter);
 
         if(savedInstanceState != null){
+            previewAdapter.restoreState(savedInstanceState);
             if(savedInstanceState.containsKey("visible")){
                 compressBtn.setVisibility(savedInstanceState.getBoolean("visible") ? View.VISIBLE : View.GONE);
             }
 
             if(savedInstanceState.containsKey("pic_path")){
-                picturePath = savedInstanceState.getString("pic_path");
-
-                imagePreview.setImageBitmap(CompressUtils.scaleImageForPreview(picturePath, 100));
-
-                if(pictureFile == null) pictureFile = new File(picturePath);
-                filePath.setText(picturePath);
-                fileSize.setText(pictureFile.length() + "Kb");
+                picturePaths = savedInstanceState.getStringArray("pic_path");
+                previewAdapter.swapData(picturePaths);
             }
         }
 
@@ -90,25 +96,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launchAndroidImagePicker(){
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        intent = Intent.createChooser(intent, "Pick Images from ");
+        startActivityForResult(intent, IMAGE_REQUEST_CODE);
+    }
+
+    public void launchAndroidVideoPicker(){
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, IMAGE_REQUEST_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
-            if(data != null){
-                picturePath = getPicPathFromPicUri(MainActivity.this, data.getData());
-                //WHAT IF WE DON'T GET A PICTUREPATH
-                if(!picturePath.isEmpty()) {
-                    compressBtn.setVisibility(View.VISIBLE);
-                    imagePreview.setImageBitmap(CompressUtils.scaleImageForPreview(picturePath, 100));
-
-                    pictureFile = new File(picturePath);
-                    filePath.setText(picturePath);
-                    fileSize.setText(pictureFile.length() + "Kb");
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (data != null) {
+                Uri[] uris;
+                if (data.getClipData() == null) {
+                    uris = new Uri[]{data.getData()};
+                    picturePaths = getPicPathsFromPicUris(MainActivity.this, uris);
+                } else {
+                    uris = new Uri[data.getClipData().getItemCount()];
+                    for (int i = 0; i < data.getClipData().getItemCount(); i++) {
+                        uris[i] = data.getClipData().getItemAt(i).getUri();
+                    }
+                    picturePaths = getPicPathsFromPicUris(MainActivity.this, uris);
                 }
+                previewAdapter.swapData(picturePaths);
+                compressBtn.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -117,24 +136,38 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(!picturePath.isEmpty()) outState.putString("pic_path", picturePath);
+        if(picturePaths != null && picturePaths.length > 0) outState.putStringArray("pic_path", picturePaths);
+        previewAdapter.saveState(outState);
         outState.putBoolean("visible", compressBtn.getVisibility() == View.VISIBLE);
+
     }
 
-    public static String getPicPathFromPicUri(Context c, Uri picUri) {
+    public static String[] getPicPathsFromPicUris(Context c, Uri[] picUris) {
+        Uri mediaUri = Uri.parse("content://media/external/images/media");
         String[] filePathColumn = { MediaStore.Images.Media.DATA };
-        Cursor cursor = c.getContentResolver().query(picUri, filePathColumn, null, null, null);
-        if(cursor == null){
-            Toast.makeText(c, "error loading pic", Toast.LENGTH_LONG).show();
-            return "";
+        String[] picPaths = new String[picUris.length];
+        int i = 0;
+        for(Uri picUri : picUris) {
+            if(picUri.getAuthority().equals("com.android.providers.media.documents")){
+                picUri = mediaUri.buildUpon().appendPath(picUri.getLastPathSegment().split(":")[1]).build();
+            }
+            Cursor cursor = c.getContentResolver().query(picUri, filePathColumn, null, null, null);
+            if (cursor == null || !cursor.moveToFirst()) {
+                Toast.makeText(c, "error loading pic", Toast.LENGTH_LONG).show();
+                break;
+            }
+            cursor.moveToFirst();
+            picPaths[i] = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
+            Log.d(TAG, "path: " + cursor.getString(cursor.getColumnIndex(filePathColumn[0])));
+            if(!cursor.isClosed()) cursor.close();
+            i++;
         }
-        cursor.moveToFirst();
-        return cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
+        return picPaths;
     }
 
     public void showCompressDialog(){
         Intent intent = new Intent(this, CompressPicActivity.class);
-        intent.putExtra(CompressService.PIC_PATH, picturePath);
+        intent.putExtra(CompressService.PIC_PATH, picturePaths);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
