@@ -95,7 +95,7 @@ public class CompressService extends Service {
     }
 
     public Bitmap getBitMapForNotification(Uri picUri, NotificationCompat.Builder builder){
-        picPath = MainActivity.getPicPathFromPicUri(getBaseContext(), picUri);
+        picPath = MainActivity.getPicPathsFromPicUris(getBaseContext(), new Uri[]{picUri})[0];
         Log.d(TAG, "PIC_PATH: " + picPath);
         builder.setLargeIcon(CompressUtils.scaleImageForPreview(picPath, 100));
         return CompressUtils.scaleImageForPreview(picPath, 300);
