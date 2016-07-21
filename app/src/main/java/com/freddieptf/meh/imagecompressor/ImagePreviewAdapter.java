@@ -1,8 +1,8 @@
 package com.freddieptf.meh.imagecompressor;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,9 +47,15 @@ public class ImagePreviewAdapter extends RecyclerView.Adapter<ImagePreviewAdapte
 
     @Override
     public void onBindViewHolder(ImagePreviewVH holder, int position) {
-        Log.d(TAG, "BIND: " + picPaths[position]);
         if(selected.contains(position)) holder.itemView.setSelected(true);
-        holder.previewImage.setImageBitmap(CompressUtils.scaleImageForPreview(picPaths[position], 100));
+
+        Bitmap bitmap;
+        if(ImageCache.getInstance().getBitmapFromCache(picPaths[position]) == null){
+            bitmap = CompressUtils.scaleImageForPreview(picPaths[position], 100);
+            ImageCache.getInstance().addBitmapToCache(picPaths[position], bitmap);
+        }else bitmap = ImageCache.getInstance().getBitmapFromCache(picPaths[position]);
+
+        holder.previewImage.setImageBitmap(bitmap);
         holder.itemView.setTag(position);
         holder.itemView.setOnClickListener(this);
     }
@@ -69,8 +75,7 @@ public class ImagePreviewAdapter extends RecyclerView.Adapter<ImagePreviewAdapte
                 v.setSelected(false);
                 selected.remove((Integer)v.getTag());
             }
-            onImageClick.onImageClick(picPaths[(int) v.getTag()]);
-            Log.d(TAG, "selected: " + selected.size());
+            onImageClick.onImageClick(picPaths[(int) v.getTag()], getSelected().size());
         }
     }
 
@@ -98,7 +103,7 @@ public class ImagePreviewAdapter extends RecyclerView.Adapter<ImagePreviewAdapte
     }
 
     public interface ImageClickListener {
-        void onImageClick(String picPath);
+        void onImageClick(String picPath, int totalSelected);
     }
 
 }
