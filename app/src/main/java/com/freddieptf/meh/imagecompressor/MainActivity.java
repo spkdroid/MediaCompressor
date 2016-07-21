@@ -13,11 +13,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,11 +43,12 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.previewRecycler);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recyclerView.hasFixedSize();
+        recyclerView.setHasFixedSize(true);
         previewAdapter = new ImagePreviewAdapter();
         previewAdapter.setClickListener(new ImagePreviewAdapter.ImageClickListener() {
             @Override
-            public void onImageClick(String picPath) {
+            public void onImageClick(String picPath, int ts) {
+                compressBtn.setEnabled(ts > 0);
             }
         });
         recyclerView.setAdapter(previewAdapter);
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             if(savedInstanceState.containsKey("pic_path")){
                 picturePaths = savedInstanceState.getStringArray("pic_path");
                 previewAdapter.swapData(picturePaths);
+                compressBtn.setEnabled(previewAdapter.getSelected().size() > 0);
             }
         }
 
@@ -128,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 previewAdapter.swapData(picturePaths);
                 compressBtn.setVisibility(View.VISIBLE);
+                compressBtn.setEnabled(previewAdapter.getSelected().size() > 0);
             }
         }
     }
@@ -158,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
             }
             cursor.moveToFirst();
             picPaths[i] = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
-            Log.d(TAG, "path: " + cursor.getString(cursor.getColumnIndex(filePathColumn[0])));
             if(!cursor.isClosed()) cursor.close();
             i++;
         }
@@ -167,8 +170,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void showCompressDialog(){
         Intent intent = new Intent(this, CompressPicActivity.class);
-        intent.putExtra(CompressService.PIC_PATH, picturePaths);
+        intent.putExtra(CameraActionHandlerService.PIC_PATH, filterSelectedPaths(picturePaths));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private String[] filterSelectedPaths(String[] picPaths){
+        ArrayList<Integer> s = previewAdapter.getSelected();
+        String[] paths = new String[s.size()];
+        for (int i = 0; i < s.size(); i++){
+            paths[i] = picPaths[s.get(i)];
+        }
+        return paths;
     }
 }

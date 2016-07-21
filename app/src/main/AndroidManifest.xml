@@ -24,8 +24,13 @@
             android:theme="@style/Theme.AppCompat.Light.Dialog"
             android:launchMode="singleTask" />
 
-        <service android:name=".CompressService"
+        <activity android:name=".CompressVidActivity"/>
+
+        <service android:name=".CameraActionHandlerService"
             android:process=":compressService"/>
+
+        <service android:name=".CompressImgsService"
+            android:process=":compressImgsService"/>
 
         <receiver android:name=".CameraActionReceiver">
             <intent-filter>

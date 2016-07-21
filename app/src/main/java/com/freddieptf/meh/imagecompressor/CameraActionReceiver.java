@@ -15,8 +15,8 @@ public class CameraActionReceiver extends BroadcastReceiver {
         Log.d(TAG, "OnReceive");
         if(intent != null && intent.getData() != null) {
             Log.d(TAG, intent.getData() + "\n" + intent.getAction());
-            Intent compressServiceIntent = new Intent(context, CompressService.class);
-            compressServiceIntent.putExtra(CompressService.MEDIA_URI, intent.getData().toString());
+            Intent compressServiceIntent = new Intent(context, CameraActionHandlerService.class);
+            compressServiceIntent.putExtra(CameraActionHandlerService.MEDIA_URI, intent.getData().toString());
             compressServiceIntent.setAction(intent.getAction());
             context.startService(compressServiceIntent);
         }

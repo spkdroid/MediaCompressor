@@ -14,7 +14,7 @@ import android.util.Log;
 /**
  * Created by freddieptf on 16/07/16.
  */
-public class CompressService extends Service {
+public class CameraActionHandlerService extends Service {
 
     private static final String TAG               = "CompressService";
     public static final String MEDIA_URI          = "media_uri";
@@ -60,7 +60,7 @@ public class CompressService extends Service {
                     startActivity(intentDialogActivty);
                 case ACTION_STOP:
                     Log.d(TAG, "STOP");
-                    this.stopService(new Intent(this, CompressService.class)); //stop the service when after any of our actions is consumed
+                    this.stopService(new Intent(this, CameraActionHandlerService.class)); //stop the service when after any of our actions is consumed
                     break;
                 default:
             }
@@ -78,13 +78,13 @@ public class CompressService extends Service {
         bigPictureStyle.bigPicture(getBitMapForNotification(Uri.parse(intent.getStringExtra(MEDIA_URI)), builder));
         bigPictureStyle.setSummaryText("Compress this image?");
 
-        Intent intentCompress = new Intent(this, CompressService.class);
+        Intent intentCompress = new Intent(this, CameraActionHandlerService.class);
         intentCompress.setAction(ACTION_COMPRESS);
         intentCompress.putExtra(PIC_PATH, picPath);
         PendingIntent pendingIntentCompress =
                 PendingIntent.getService(this, 3454, intentCompress, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        Intent intentStopService = new Intent(this, CompressService.class);
+        Intent intentStopService = new Intent(this, CameraActionHandlerService.class);
         intentStopService.setAction(ACTION_STOP);
         PendingIntent pendingIntentStopService = PendingIntent.getService(this, 3534, intentStopService, PendingIntent.FLAG_ONE_SHOT);
 

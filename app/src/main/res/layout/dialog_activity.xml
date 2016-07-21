@@ -10,6 +10,7 @@
     android:minWidth="480dp">
 
     <TextView
+        android:id="@+id/tv_detailText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/compressed_image_message"/>
