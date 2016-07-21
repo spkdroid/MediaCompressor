@@ -11,14 +11,15 @@ public class ImageCache {
     private static LruCache<String, Bitmap> lruCache;
     private static ImageCache imageCache;
 
-    private ImageCache(){}
+    private ImageCache(){
+        int maxMem = (int) Runtime.getRuntime().maxMemory()/1024;
+        int cacheSize = maxMem/4;
+        lruCache = new LruCache<>(cacheSize);
+    }
 
     public static ImageCache getInstance() {
         if(imageCache == null){
             imageCache = new ImageCache();
-            int maxMem = (int) Runtime.getRuntime().maxMemory()/1024;
-            int cacheSize = maxMem/4;
-            lruCache = new LruCache<>(cacheSize);
         }
         return imageCache;
     }
