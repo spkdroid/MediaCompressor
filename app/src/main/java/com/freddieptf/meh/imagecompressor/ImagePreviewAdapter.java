@@ -38,6 +38,10 @@ public class ImagePreviewAdapter extends RecyclerView.Adapter<ImagePreviewAdapte
         return selected;
     }
 
+    public void clearSelectedItems(){
+        selected.clear();
+    }
+
     @Override
     public ImagePreviewVH onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ImagePreviewVH(
@@ -48,6 +52,7 @@ public class ImagePreviewAdapter extends RecyclerView.Adapter<ImagePreviewAdapte
     @Override
     public void onBindViewHolder(ImagePreviewVH holder, int position) {
         if(selected.contains(position)) holder.itemView.setSelected(true);
+        else holder.itemView.setSelected(false);
 
         Bitmap bitmap;
         if(ImageCache.getInstance().getBitmapFromCache(picPaths[position]) == null){
