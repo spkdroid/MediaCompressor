@@ -1,6 +1,9 @@
 package com.freddieptf.meh.imagecompressor;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,7 +29,8 @@ public class CompressPicActivity extends AppCompatActivity {
 
     EditText height, width;
     SeekBar seekBar;
-    TextView tvQuality, tvDetailText;
+    TextView tvQuality, tvDetailText, tvDone;
+    ProgressBar progressBar;
     float factor;
     HeightTextWatcher heightTextWatcher;
     WidthTextWatcher widthTextWatcher;
@@ -46,6 +51,8 @@ public class CompressPicActivity extends AppCompatActivity {
         seekBar = (SeekBar) findViewById(R.id.seekbar_quality);
         tvQuality = (TextView) findViewById(R.id.tv_quality);
         tvDetailText = (TextView)findViewById(R.id.tv_detailText);
+        tvDone = (TextView) findViewById(R.id.tvDone);
+        progressBar = (ProgressBar) findViewById(R.id.progress);
 
         if(savedInstanceState != null && savedInstanceState.containsKey(CameraActionHandlerService.PIC_PATH)){
             picPaths = savedInstanceState.getStringArray(CameraActionHandlerService.PIC_PATH);
@@ -90,6 +97,18 @@ public class CompressPicActivity extends AppCompatActivity {
             outState.putInt(OUT_HEIGHT, outHeight);
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(broadcastReceiver, new IntentFilter(CompressImgsService.COMPRESSION_DONE));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
     }
 
     private void linkHeightWidth(){
@@ -181,6 +200,8 @@ public class CompressPicActivity extends AppCompatActivity {
     }
 
     public void compress(View view){
+        progressBar.setVisibility(View.VISIBLE);
+        tvDone.setText("");
         if(picPaths.length == 1){
             new compress(Integer.parseInt(width.getText().toString()),
                     Integer.parseInt(height.getText().toString()), seekBar.getProgress()).execute();
@@ -222,4 +243,14 @@ public class CompressPicActivity extends AppCompatActivity {
             finish();
         }
     }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            progressBar.setIndeterminate(false);
+            progressBar.setVisibility(View.GONE);
+            int i = intent.getIntExtra("num_pics", -1);
+            tvDone.setText(i == -1 ? "Failed" : i + " compressed");
+        }
+    };
 }

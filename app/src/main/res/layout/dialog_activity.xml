@@ -81,6 +81,23 @@
         android:layout_width="match_parent"
         android:gravity="end|right">
 
+        <ProgressBar
+            android:id="@+id/progress"
+            android:visibility="gone"
+            android:indeterminate="true"
+            style="?android:progressBarStyleSmall"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tvDone"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:textStyle="italic"
+            style="@style/TextAppearance.AppCompat.Small"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
