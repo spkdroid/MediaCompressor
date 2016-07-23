@@ -1,7 +1,12 @@
 package com.freddieptf.meh.imagecompressor;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +32,14 @@ public class CompressUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void compressVid(Context context, String[] commands,
+                                   FFmpegExecuteResponseHandler fFmpegExecuteResponseHandler)
+            throws FFmpegCommandAlreadyRunningException {
+
+            FFmpeg.getInstance(context).execute(commands, fFmpegExecuteResponseHandler);
+
     }
 
     public static Bitmap scaleImageForPreview(String picPath, int size){

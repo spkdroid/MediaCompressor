@@ -23,9 +23,10 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     final int IMAGE_REQUEST_CODE        = 13;
+    final int VIDEO_REQUEST_CODE        = 14;
     final int STORAGE_PERMISION_REQUEST = 101;
     private static final String TAG     = "MainActivity";
-    Button compressBtn, chooseButton;
+    Button btnCompress, btnChoosePic, btnChooseVid;
     TextView fileSize, filePath;
     String[] picturePaths;
     RecyclerView recyclerView;
@@ -36,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        chooseButton = (Button) findViewById(R.id.btnChooser);
-        compressBtn  = (Button) findViewById(R.id.btnCompress);
+        btnChoosePic = (Button) findViewById(R.id.btnChooser);
+        btnCompress = (Button) findViewById(R.id.btnCompress);
+        btnChooseVid = (Button) findViewById(R.id.btnVidActivity);
         filePath     = (TextView) findViewById(R.id.tv_filePath);
         fileSize     = (TextView) findViewById(R.id.tv_fileSize);
         recyclerView = (RecyclerView) findViewById(R.id.previewRecycler);
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         previewAdapter.setClickListener(new ImagePreviewAdapter.ImageClickListener() {
             @Override
             public void onImageClick(String picPath, int ts) {
-                compressBtn.setEnabled(ts > 0);
+                btnCompress.setEnabled(ts > 0);
             }
         });
         recyclerView.setAdapter(previewAdapter);
@@ -56,17 +58,17 @@ public class MainActivity extends AppCompatActivity {
         if(savedInstanceState != null){
             previewAdapter.restoreState(savedInstanceState);
             if(savedInstanceState.containsKey("visible")){
-                compressBtn.setVisibility(savedInstanceState.getBoolean("visible") ? View.VISIBLE : View.GONE);
+                btnCompress.setVisibility(savedInstanceState.getBoolean("visible") ? View.VISIBLE : View.GONE);
             }
 
             if(savedInstanceState.containsKey("pic_path")){
                 picturePaths = savedInstanceState.getStringArray("pic_path");
                 previewAdapter.swapData(picturePaths);
-                compressBtn.setEnabled(previewAdapter.getSelected().size() > 0);
+                btnCompress.setEnabled(previewAdapter.getSelected().size() > 0);
             }
         }
 
-        chooseButton.setOnClickListener(new View.OnClickListener() {
+        btnChoosePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(checkStoragePermission()) launchAndroidImagePicker();
@@ -74,7 +76,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        compressBtn.setOnClickListener(new View.OnClickListener() {
+        btnChooseVid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAndroidVideoPicker();
+            }
+        });
+
+        btnCompress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showCompressDialog();
@@ -111,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void launchAndroidVideoPicker(){
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, IMAGE_REQUEST_CODE);
+        startActivityForResult(intent, VIDEO_REQUEST_CODE);
     }
 
     @Override
@@ -131,8 +140,14 @@ public class MainActivity extends AppCompatActivity {
                     picturePaths = getPicPathsFromPicUris(MainActivity.this, uris);
                 }
                 previewAdapter.swapData(picturePaths);
-                compressBtn.setVisibility(View.VISIBLE);
-                compressBtn.setEnabled(previewAdapter.getSelected().size() > 0);
+                btnCompress.setVisibility(View.VISIBLE);
+                btnCompress.setEnabled(previewAdapter.getSelected().size() > 0);
+            }
+        }else if(requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK){
+            if(data != null) {
+                Intent i = new Intent(MainActivity.this, VideoActivity.class);
+                i.putExtra(CameraActionHandlerService.MEDIA_URI, data.getData().toString());
+                startActivity(i);
             }
         }
     }
@@ -143,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         if(picturePaths != null && picturePaths.length > 0) outState.putStringArray("pic_path", picturePaths);
         previewAdapter.saveState(outState);
-        outState.putBoolean("visible", compressBtn.getVisibility() == View.VISIBLE);
+        outState.putBoolean("visible", btnCompress.getVisibility() == View.VISIBLE);
 
     }
 

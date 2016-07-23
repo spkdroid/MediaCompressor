@@ -24,7 +24,7 @@
             android:theme="@style/Theme.AppCompat.Light.Dialog"
             android:launchMode="singleTask" />
 
-        <activity android:name=".CompressVidActivity"/>
+        <activity android:name=".VideoActivity"/>
 
         <service android:name=".CameraActionHandlerService"
             android:process=":compressService"/>
