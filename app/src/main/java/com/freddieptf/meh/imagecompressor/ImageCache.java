@@ -25,7 +25,7 @@ public class ImageCache {
     }
 
     public void addBitmapToCache(String key, Bitmap bitmap){
-        lruCache.put(key, bitmap);
+        if(key != null && bitmap != null) lruCache.put(key, bitmap);
     }
 
     public Bitmap getBitmapFromCache(String key){
