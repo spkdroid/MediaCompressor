@@ -56,7 +56,7 @@ public class CameraActionHandlerService extends Service {
                     Intent intentDialogActivty = new Intent(this, CompressPicActivity.class);
                     intentDialogActivty.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     Log.d(TAG, ACTION_COMPRESS + ": " + picPath);
-                    intentDialogActivty.putExtra(PIC_PATH, picPath);
+                    intentDialogActivty.putExtra(PIC_PATH, new String[]{picPath});
                     startActivity(intentDialogActivty);
                 case ACTION_STOP:
                     Log.d(TAG, "STOP");
