@@ -7,14 +7,10 @@ import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -27,37 +23,40 @@ import java.io.File;
  */
 public class CompressPicActivity extends AppCompatActivity {
 
-    EditText height, width;
     SeekBar seekBar;
     TextView tvQuality, tvDetailText, tvDone;
+    EditResolutionView resolutionView;
     ProgressBar progressBar;
-    float factor;
-    HeightTextWatcher heightTextWatcher;
-    WidthTextWatcher widthTextWatcher;
     String[] picPaths;
-    private int outWidth            = -1;
-    private int outHeight           = -1;
-    private final String OUT_WIDTH  = "ot";
-    private final String OUT_HEIGHT = "oh";
-    private static final String TAG = "DialogActivity";
+    private int          outWidth      = -1;
+    private int          outHeight     = -1;
+    private int          targetWidth   = -1;
+    private int          targetHeight  = -1;
+    private final String OUT_WIDTH     = "ot";
+    private final String OUT_HEIGHT    = "oh";
+    private final String TARGET_WIDTH  = "tw";
+    private final String TARGET_HEIGHT = "th";
+    private static final String TAG    = "DialogActivity";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_activity);
 
-        height = (EditText) findViewById(R.id.et_height);
-        width = (EditText) findViewById(R.id.et_width);
-        seekBar = (SeekBar) findViewById(R.id.seekbar_quality);
-        tvQuality = (TextView) findViewById(R.id.tv_quality);
-        tvDetailText = (TextView)findViewById(R.id.tv_detailText);
-        tvDone = (TextView) findViewById(R.id.tvDone);
-        progressBar = (ProgressBar) findViewById(R.id.progress);
+        resolutionView = (EditResolutionView) findViewById(R.id.editResolution);
+        seekBar        = (SeekBar) findViewById(R.id.seekbar_quality);
+        tvQuality      = (TextView) findViewById(R.id.tv_quality);
+        tvDetailText   = (TextView)findViewById(R.id.tv_detailText);
+        tvDone         = (TextView) findViewById(R.id.tvDone);
+        progressBar    = (ProgressBar) findViewById(R.id.progress);
 
         if(savedInstanceState != null && savedInstanceState.containsKey(CameraActionHandlerService.PIC_PATH)){
-            picPaths = savedInstanceState.getStringArray(CameraActionHandlerService.PIC_PATH);
-            outWidth = savedInstanceState.getInt(OUT_WIDTH);
-            outHeight = savedInstanceState.getInt(OUT_HEIGHT);
+            picPaths     = savedInstanceState.getStringArray(CameraActionHandlerService.PIC_PATH);
+            outWidth     = savedInstanceState.getInt(OUT_WIDTH);
+            outHeight    = savedInstanceState.getInt(OUT_HEIGHT);
+            targetWidth  = savedInstanceState.getInt(TARGET_WIDTH);
+            targetHeight = savedInstanceState.getInt(TARGET_HEIGHT);
+            resolutionView.setResolution(targetHeight, targetWidth);
         }else {
             init(getIntent());
         }
@@ -71,12 +70,9 @@ public class CompressPicActivity extends AppCompatActivity {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(picPaths[0], options); //different thread..maybe?
-        outWidth = options.outWidth;
+        outWidth  = options.outWidth;
         outHeight = options.outHeight;
-        height.setText(outHeight + "");
-        width.setText(outWidth + "");
-        factor = (float) options.outHeight / (float) options.outWidth;
-        linkHeightWidth();
+        resolutionView.setResolution(outHeight, outWidth);
         initSeekBar();
     }
 
@@ -93,10 +89,11 @@ public class CompressPicActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         if(picPaths != null && picPaths.length > 0){
             outState.putStringArray(CameraActionHandlerService.PIC_PATH, picPaths);
-            outState.putInt(OUT_WIDTH, outWidth);
-            outState.putInt(OUT_HEIGHT, outHeight);
+            outState.putInt(OUT_WIDTH,     outWidth);
+            outState.putInt(OUT_HEIGHT,    outHeight);
+            outState.putInt(TARGET_WIDTH,  resolutionView.getResWidth());
+            outState.putInt(TARGET_HEIGHT, resolutionView.getResHeight());
         }
-
     }
 
     @Override
@@ -109,13 +106,6 @@ public class CompressPicActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(broadcastReceiver);
-    }
-
-    private void linkHeightWidth(){
-        heightTextWatcher = new HeightTextWatcher();
-//        height.addTextChangedListener(heightTextWatcher);
-        widthTextWatcher = new WidthTextWatcher();
-        width.addTextChangedListener(widthTextWatcher);
     }
 
     private void initSeekBar(){
@@ -137,64 +127,6 @@ public class CompressPicActivity extends AppCompatActivity {
         });
     }
 
-    private class HeightTextWatcher implements TextWatcher{
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            //remove it...or we'll get stuck in a loop between the editTexts afterTextChanged callback, FOREVERRRRRR
-            width.removeTextChangedListener(widthTextWatcher);
-
-            String num = s.toString();
-            if(!num.isEmpty()) {
-                float d = Float.parseFloat(num);
-                width.setText((int) (d / factor) + "");
-            }else width.setText("");
-
-            width.addTextChangedListener(widthTextWatcher);
-        }
-    }
-
-    private class WidthTextWatcher implements TextWatcher{
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            height.removeTextChangedListener(heightTextWatcher);
-
-            String num = s.toString();
-            if(!num.isEmpty()) {
-                float d = Float.parseFloat(num);
-                height.setText((int)(d * factor) + "");
-            }else height.setText("");
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    height.addTextChangedListener(heightTextWatcher);
-                }
-            }, 1);
-        }
-    }
-
     public void cancel(View view){
         finish();
     }
@@ -203,12 +135,11 @@ public class CompressPicActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         tvDone.setText("");
         if(picPaths.length == 1){
-            new compress(Integer.parseInt(width.getText().toString()),
-                    Integer.parseInt(height.getText().toString()), seekBar.getProgress()).execute();
+            new compress(resolutionView.getResWidth(), resolutionView.getResHeight(), seekBar.getProgress()).execute();
         }else if(picPaths.length > 1){
-            int targetWidth = Integer.parseInt(width.getText().toString());
-            int targetHeight = Integer.parseInt(height.getText().toString());
-            Intent i = new Intent(CompressPicActivity.this, CompressImgsService.class);
+            targetWidth  = resolutionView.getResWidth();
+            targetHeight = resolutionView.getResHeight();
+            Intent i     = new Intent(CompressPicActivity.this, CompressImgsService.class);
             i.putExtra(CompressImgsService.EXTRA_PIC_PATHS, picPaths);
             i.putExtra(CompressImgsService.EXTRA_HEIGHT, targetHeight);
             i.putExtra(CompressImgsService.EXTRA_WIDTH, targetWidth);
@@ -223,9 +154,9 @@ public class CompressPicActivity extends AppCompatActivity {
         int targetHeight;
         int quality;
 
-        public compress(int targetHidth, int targetHeight, int quality){
+        public compress(int targetWidth, int targetHeight, int quality){
             this.targetHeight = targetHeight;
-            this.targetWidth = targetHidth;
+            this.targetWidth = targetWidth;
             this.quality = quality;
         }
         @Override
