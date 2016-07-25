@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -99,13 +100,13 @@ public class CompressPicActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(broadcastReceiver, new IntentFilter(CompressImgsService.COMPRESSION_DONE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter(CompressService.PROGRESS_UPDATE));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     private void initSeekBar(){
@@ -139,12 +140,13 @@ public class CompressPicActivity extends AppCompatActivity {
         }else if(picPaths.length > 1){
             targetWidth  = resolutionView.getResWidth();
             targetHeight = resolutionView.getResHeight();
-            Intent i     = new Intent(CompressPicActivity.this, CompressImgsService.class);
-            i.putExtra(CompressImgsService.EXTRA_PIC_PATHS, picPaths);
-            i.putExtra(CompressImgsService.EXTRA_HEIGHT, targetHeight);
-            i.putExtra(CompressImgsService.EXTRA_WIDTH, targetWidth);
-            i.putExtra(CompressImgsService.EXTRA_QUALITY, seekBar.getProgress());
-            i.putExtra(CompressImgsService.EXTRA_IN_SAMPLE_SIZE, Math.min(outWidth/targetWidth, outHeight/targetHeight));
+            Intent i     = new Intent(CompressPicActivity.this, CompressService.class);
+            i.setAction(CompressService.ACTION_COMPRESS_PIC);
+            i.putExtra(CompressService.EXTRA_PIC_PATHS, picPaths);
+            i.putExtra(CompressService.EXTRA_HEIGHT, targetHeight);
+            i.putExtra(CompressService.EXTRA_WIDTH, targetWidth);
+            i.putExtra(CompressService.EXTRA_QUALITY, seekBar.getProgress());
+            i.putExtra(CompressService.EXTRA_IN_SAMPLE_SIZE, Math.min(outWidth/targetWidth, outHeight/targetHeight));
             startService(i);
         }
     }
