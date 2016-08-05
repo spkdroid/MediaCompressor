@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:text="@string/compressed_image_message"/>
 
-    <com.freddieptf.meh.imagecompressor.EditResolutionView
+    <com.freddieptf.meh.imagecompressor.views.EditResolutionView
         android:id="@+id/editResolution"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

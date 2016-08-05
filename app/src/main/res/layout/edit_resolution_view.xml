@@ -2,29 +2,33 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_centerInParent="true">
 
-        <TextView android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Size"
-            android:layout_marginRight="8dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:text="Size" />
 
-        <EditText android:id="@+id/et_height"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:inputType="number"
-            android:text="1280"/>
+    <EditText
+        android:id="@+id/et_width"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:inputType="number"
+        android:text="1280" />
 
-        <TextView android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="x"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="x" />
 
-        <EditText android:id="@+id/et_width"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:inputType="number"
-            android:text="720"/>
+    <EditText
+        android:id="@+id/et_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:inputType="number"
+        android:text="720" />
 
 </merge>

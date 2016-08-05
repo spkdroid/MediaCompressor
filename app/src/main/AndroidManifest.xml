@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.freddieptf.meh.imagecompressor">
+    package="com.freddieptf.meh.imagecompressor"
+    android:extractNativeLibs="false">
     
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -26,12 +27,12 @@
 
         <activity android:name=".VideoActivity"/>
 
-        <service android:name=".CameraActionHandlerService"
+        <service android:name=".services.CameraActionHandlerService"
             android:process=":compressService"/>
 
-        <service android:name=".CompressService" />
+        <service android:name=".services.CompressService" />
 
-        <receiver android:name=".CameraActionReceiver">
+        <receiver android:name=".receivers.CameraActionReceiver">
             <intent-filter>
                 <action android:name="android.hardware.action.NEW_PICTURE" />
                 <action android:name="android.hardware.action.NEW_VIDEO"/>

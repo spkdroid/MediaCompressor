@@ -13,10 +13,14 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.freddieptf.meh.imagecompressor.services.CameraActionHandlerService;
+import com.freddieptf.meh.imagecompressor.adapters.ImagePreviewAdapter;
 
 import java.util.ArrayList;
 
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btnChoosePic = (Button) findViewById(R.id.btnChooser);
-        btnCompress = (Button) findViewById(R.id.btnCompress);
+        btnCompress  = (Button) findViewById(R.id.btnCompress);
         btnChooseVid = (Button) findViewById(R.id.btnVidActivity);
         filePath     = (TextView) findViewById(R.id.tv_filePath);
         fileSize     = (TextView) findViewById(R.id.tv_fileSize);
@@ -119,7 +123,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launchAndroidVideoPicker(){
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("video/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        intent = Intent.createChooser(intent, "Pick Videos from ");
         startActivityForResult(intent, VIDEO_REQUEST_CODE);
     }
 
@@ -146,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         }else if(requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK){
             if(data != null) {
                 Intent i = new Intent(MainActivity.this, VideoActivity.class);
-                i.putExtra(CameraActionHandlerService.MEDIA_URI, data.getData().toString());
+                i.putExtra(CameraActionHandlerService.MEDIA_URI, getNormalisedVideoUriFromUri(data.getData()));
                 startActivity(i);
             }
         }
@@ -182,6 +190,16 @@ public class MainActivity extends AppCompatActivity {
             i++;
         }
         return picPaths;
+    }
+
+    public static String getNormalisedVideoUriFromUri(Uri uri){
+        Uri mediaUri = Uri.parse("content://media/external/video/media");
+        String ss;
+        if(uri.getAuthority().equals("com.android.providers.media.documents")){
+            ss = mediaUri.buildUpon().appendPath(uri.getLastPathSegment().split(":")[1]).build().toString();
+        }else ss = uri.toString();
+        Log.d(TAG, "Video uri: " + uri.toString());
+        return ss;
     }
 
     public void showCompressDialog(){
