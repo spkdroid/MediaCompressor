@@ -28,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
 
     final int IMAGE_REQUEST_CODE        = 13;
     final int VIDEO_REQUEST_CODE        = 14;
-    final int STORAGE_PERMISION_REQUEST = 101;
+    final int STORAGE_PERMISION_REQUEST_PIC = 101;
+    final int STORAGE_PERMISION_REQUEST_VID = 102;
     private static final String TAG     = "MainActivity";
     Button btnCompress, btnChoosePic, btnChooseVid;
     TextView fileSize, filePath;
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         btnChoosePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checkStoragePermission()) launchAndroidImagePicker();
+                if(checkStoragePermission(STORAGE_PERMISION_REQUEST_PIC)) launchAndroidImagePicker();
                 previewAdapter.clearSelectedItems();
             }
         });
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         btnChooseVid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchAndroidVideoPicker();
+                if(checkStoragePermission(STORAGE_PERMISION_REQUEST_VID)) launchAndroidVideoPicker();
             }
         });
 
@@ -95,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private boolean checkStoragePermission(){
+    private boolean checkStoragePermission(int requestCode){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISION_REQUEST);
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
                 return false;
             }
         }
@@ -107,8 +108,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == STORAGE_PERMISION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if(requestCode == STORAGE_PERMISION_REQUEST_PIC && grantResults[0] == PackageManager.PERMISSION_GRANTED){
             launchAndroidImagePicker();
+        }else if(requestCode == STORAGE_PERMISION_REQUEST_VID && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            launchAndroidVideoPicker();
         }
     }
 
