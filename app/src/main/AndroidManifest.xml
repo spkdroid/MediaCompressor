@@ -32,7 +32,8 @@
 
         <service android:name=".services.CompressService" />
 
-        <receiver android:name=".receivers.CameraActionReceiver">
+        <receiver android:name=".receivers.CameraActionReceiver"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.hardware.action.NEW_PICTURE" />
                 <action android:name="android.hardware.action.NEW_VIDEO"/>
