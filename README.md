@@ -1,5 +1,7 @@
 # Media Compressor/Resizer...*or whatever*
 
+[![CircleCI](https://circleci.com/gh/freddieptf/ImageCompressor.svg?style=svg)](https://circleci.com/gh/freddieptf/ImageCompressor)
+
 This is a little utility app that listens for the NEW_PICTURE system broadcast from the camera and pops up a notification to compress the picture taken on the fly. You can also just do this in app where you can actually pick multiple images.
 
 #### Your phone's CPU wept
