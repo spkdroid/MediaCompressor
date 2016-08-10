@@ -3,6 +3,7 @@ package com.freddieptf.meh.imagecompressor.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
@@ -24,7 +25,12 @@ public class CompressUtils {
         try {
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(picture), null, options);
             bitmap = Bitmap.createScaledBitmap(bitmap, desWidth, desHeight, false);
-            FileOutputStream outputStream = new FileOutputStream(picture.getParent() + "/compressed_" + picture.getName());
+
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                    + File.separator + "MediaCompress-uh" + File.separator + "Pictures");
+            if(!file.exists()) file.mkdirs();
+            FileOutputStream outputStream = new FileOutputStream(file.getAbsolutePath()
+                    + File.separator + picture.getName());
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             outputStream.close();
             System.gc();
