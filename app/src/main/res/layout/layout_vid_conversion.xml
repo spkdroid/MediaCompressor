@@ -1,136 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
         android:paddingTop="8dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Convert video to " />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown" />
+
+
+    </TableRow>
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Encoding Speed"
+        android:textColor="?colorAccent"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="@string/a_slower_preset_will_provide_better_compression_compression_is_quality_per_filesize_but_take_more_time"
+        android:textStyle="italic" />
+
+    <RadioGroup
+        android:id="@+id/rgButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checkedButton="@+id/rb_veryFast"
+        android:paddingBottom="16dp"
+        android:paddingTop="8dp"
+        android:weightSum="4">
+
+        <RadioButton
+            android:id="@+id/rb_slow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Slow" />
+
+        <RadioButton
+            android:id="@+id/rb_fast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Fast" />
+
+        <RadioButton
+            android:id="@+id/rb_veryFast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Very Fast" />
+
+        <RadioButton
+            android:id="@+id/rb_ultraFast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ultra Fast" />
+
+    </RadioGroup>
+
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Video Quality"
+        android:textColor="?colorAccent"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="@string/a_lower_value_is_a_higher_quality_and_a_subjectively_sane_range_is_18_28"
+        android:textStyle="italic" />
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
 
         <TextView
-            style="@style/Base.TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
+            android:id="@+id/tv_quality"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:text="Conversion"
-            android:textColor="?colorAccent"
-            android:textStyle="bold" />
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
-            android:paddingTop="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Convert video to " />
-
-            <Spinner
-                android:id="@+id/spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:spinnerMode="dropdown" />
-
-
-        </TableRow>
-
-        <TextView
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Encoding Speed"
-            android:textColor="?colorAccent"
-            android:textStyle="bold" />
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:text="@string/a_slower_preset_will_provide_better_compression_compression_is_quality_per_filesize_but_take_more_time"
-            android:textStyle="italic" />
-
-        <RadioGroup
-            android:id="@+id/rgButtons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checkedButton="@+id/rb_fast"
-            android:orientation="horizontal"
-            android:paddingBottom="16dp"
-            android:paddingTop="8dp"
-            android:weightSum="4">
-
-            <RadioButton
-                android:id="@+id/rb_slow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Slow" />
-
-            <RadioButton
-                android:id="@+id/rb_fast"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Fast" />
-
-            <RadioButton
-                android:id="@+id/rb_veryFast"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Very Fast" />
-
-            <RadioButton
-                android:id="@+id/rb_ultraFast"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Ultra Fast" />
-
-        </RadioGroup>
-
-
-        <TextView
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Video Quality"
-            android:textColor="?colorAccent"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/a_lower_value_is_a_higher_quality_and_a_subjectively_sane_range_is_18_28"
-            android:paddingTop="8dp"
-            android:textStyle="italic" />
+            android:layout_marginRight="4dp" />
 
         <SeekBar
             android:id="@+id/sk_vidQuality"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="51"
+            android:max="12"
             android:paddingBottom="16dp"
             android:paddingTop="8dp"
-            android:progress="23" />
+            android:progress="7" />
 
+    </TableRow>
 
-        <Button
-            android:id="@+id/btnConvert"
-            style="@style/Base.Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|end"
-            android:onClick="convertVideo"
-            android:text="Convert" />
+</merge>
 
-
-    </LinearLayout>
-
-</layout>
