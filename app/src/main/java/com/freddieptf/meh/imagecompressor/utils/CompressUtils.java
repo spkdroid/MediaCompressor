@@ -56,7 +56,7 @@ public class CompressUtils {
         return BitmapFactory.decodeFile(picPath, options);
     }
 
-    public static int calculateInSampleSize(String picPath, int REQUIRED_SIZE) {
+    private static int calculateInSampleSize(String picPath, int REQUIRED_SIZE) {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(picPath, o);

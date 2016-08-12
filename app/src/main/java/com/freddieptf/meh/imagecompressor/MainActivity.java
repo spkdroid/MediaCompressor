@@ -1,36 +1,32 @@
 package com.freddieptf.meh.imagecompressor;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.freddieptf.meh.imagecompressor.services.CameraActionHandlerService;
 import com.freddieptf.meh.imagecompressor.adapters.ImagePreviewAdapter;
+import com.freddieptf.meh.imagecompressor.services.CameraActionHandlerService;
+import com.freddieptf.meh.imagecompressor.utils.MediaUtils;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    final int IMAGE_REQUEST_CODE        = 13;
-    final int VIDEO_REQUEST_CODE        = 14;
+    final int IMAGE_REQUEST_CODE = 13;
+    final int VIDEO_REQUEST_CODE = 14;
     final int STORAGE_PERMISION_REQUEST_PIC = 101;
     final int STORAGE_PERMISION_REQUEST_VID = 102;
-    private static final String TAG     = "MainActivity";
+    private static final String TAG = "MainActivity";
     Button btnCompress, btnChoosePic, btnChooseVid;
     TextView fileSize, filePath;
     String[] picturePaths;
@@ -115,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void launchAndroidImagePicker(){
+    private void launchAndroidImagePicker(){
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -125,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, IMAGE_REQUEST_CODE);
     }
 
-    public void launchAndroidVideoPicker(){
+    private void launchAndroidVideoPicker(){
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("video/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -142,13 +138,13 @@ public class MainActivity extends AppCompatActivity {
                 Uri[] uris;
                 if (data.getClipData() == null) {
                     uris = new Uri[]{data.getData()};
-                    picturePaths = getPicPathsFromPicUris(MainActivity.this, uris);
+                    picturePaths = MediaUtils.getPicPathsFromPicUris(MainActivity.this, uris);
                 } else {
                     uris = new Uri[data.getClipData().getItemCount()];
                     for (int i = 0; i < data.getClipData().getItemCount(); i++) {
                         uris[i] = data.getClipData().getItemAt(i).getUri();
                     }
-                    picturePaths = getPicPathsFromPicUris(MainActivity.this, uris);
+                    picturePaths = MediaUtils.getPicPathsFromPicUris(MainActivity.this, uris);
                 }
                 previewAdapter.swapData(picturePaths);
                 btnCompress.setVisibility(View.VISIBLE);
@@ -157,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         }else if(requestCode == VIDEO_REQUEST_CODE && resultCode == RESULT_OK){
             if(data != null) {
                 Intent i = new Intent(MainActivity.this, VideoActivity.class);
-                i.putExtra(CameraActionHandlerService.MEDIA_URI, getNormalisedVideoUriFromUri(data.getData()));
+                i.putExtra(CameraActionHandlerService.MEDIA_URI, MediaUtils.getNormalisedVideoUri(data.getData()));
                 startActivity(i);
             }
         }
@@ -173,38 +169,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static String[] getPicPathsFromPicUris(Context c, Uri[] picUris) {
-        Uri mediaUri = Uri.parse("content://media/external/images/media");
-        String[] filePathColumn = { MediaStore.Images.Media.DATA };
-        String[] picPaths = new String[picUris.length];
-        int i = 0;
-        for(Uri picUri : picUris) {
-            if(picUri.getAuthority().equals("com.android.providers.media.documents")){
-                picUri = mediaUri.buildUpon().appendPath(picUri.getLastPathSegment().split(":")[1]).build();
-            }
-            Cursor cursor = c.getContentResolver().query(picUri, filePathColumn, null, null, null);
-            if (cursor == null || !cursor.moveToFirst()) {
-                Toast.makeText(c, "error loading pic", Toast.LENGTH_LONG).show();
-                break;
-            }
-            cursor.moveToFirst();
-            picPaths[i] = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
-            if(!cursor.isClosed()) cursor.close();
-            i++;
-        }
-        return picPaths;
-    }
-
-    public static String getNormalisedVideoUriFromUri(Uri uri){
-        Uri mediaUri = Uri.parse("content://media/external/video/media");
-        String ss;
-        if(uri.getAuthority().equals("com.android.providers.media.documents")){
-            ss = mediaUri.buildUpon().appendPath(uri.getLastPathSegment().split(":")[1]).build().toString();
-        }else ss = uri.toString();
-        Log.d(TAG, "Video uri: " + uri.toString());
-        return ss;
-    }
-
     public void showCompressDialog(){
         Intent intent = new Intent(this, CompressPicActivity.class);
         intent.putExtra(CameraActionHandlerService.PIC_PATH, filterSelectedPaths(picturePaths));
@@ -212,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    //only include selected paths
     private String[] filterSelectedPaths(String[] picPaths){
         ArrayList<Integer> s = previewAdapter.getSelected();
         String[] paths = new String[s.size()];

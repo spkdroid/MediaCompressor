@@ -82,7 +82,7 @@ public class ImagePreviewAdapter extends RecyclerView.Adapter<ImagePreviewAdapte
                 selected.add((Integer)v.getTag());
             }else {
                 v.setSelected(false);
-                selected.remove((Integer)v.getTag());
+                selected.remove(v.getTag());
             }
             onImageClick.onImageClick(picPaths[(int) v.getTag()], getSelected().size());
         }
