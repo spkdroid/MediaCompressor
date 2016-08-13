@@ -11,10 +11,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.freddieptf.meh.imagecompressor.utils.CompressUtils;
-import com.freddieptf.meh.imagecompressor.R;
 import com.freddieptf.meh.imagecompressor.CompressPicActivity;
-import com.freddieptf.meh.imagecompressor.MainActivity;
+import com.freddieptf.meh.imagecompressor.R;
+import com.freddieptf.meh.imagecompressor.utils.CompressUtils;
+import com.freddieptf.meh.imagecompressor.utils.MediaUtils;
 
 /**
  * Created by freddieptf on 16/07/16.
@@ -100,7 +100,7 @@ public class CameraActionHandlerService extends Service {
     }
 
     public Bitmap getBitMapForNotification(Uri picUri, NotificationCompat.Builder builder){
-        picPath = MainActivity.getPicPathsFromPicUris(getBaseContext(), new Uri[]{picUri})[0];
+        picPath = MediaUtils.getPicPathsFromPicUris(getBaseContext(), new Uri[]{picUri})[0];
         Log.d(TAG, "PIC_PATH: " + picPath);
         builder.setLargeIcon(CompressUtils.scaleImageForPreview(picPath, 100));
         return CompressUtils.scaleImageForPreview(picPath, 300);
