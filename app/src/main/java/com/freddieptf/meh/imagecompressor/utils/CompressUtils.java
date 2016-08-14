@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 
+import com.freddieptf.meh.imagecompressor.R;
 import com.freddieptf.meh.imagecompressor.services.CompressService;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
@@ -102,6 +103,57 @@ public class CompressUtils {
         if (w % 2 != 0) w++;
         if (h % 2 != 0) h++;
         return w + ":" + h;
+    }
+
+    public static void convertVideo(Context context, String path, String vidContainer, String crf, String encodingPreset) {
+        File file = new File(path);
+        if(vidContainer == null) vidContainer = "mkv";
+
+        File outputFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                + File.separator + "MediaCompress-uh" + File.separator + "Videos");
+        if (!outputFile.exists()) outputFile.mkdirs();
+
+        String fileName = outputFile.getAbsolutePath() + File.separator + file.getName() + "." + vidContainer;
+
+        String[] convertCmdx264 = new String[]{
+                "-i", path,
+                "-c:v", "libx264",
+                "-preset", encodingPreset,
+                "-crf", crf,
+                "-threads", String.valueOf(Runtime.getRuntime().availableProcessors()),
+                "-c:a", "copy",
+                "-profile:v", "baseline", "-level", "3.0",
+                fileName
+        };
+
+        file = new File(fileName);
+        if(file.exists()) file.delete();
+
+//        String[] convertCmdvp9 = new String[]{
+//                "-y", "-i", videoDetails[0], "-c:v", "libvpx-vp9", "-quality", "good", "-cpu-used", "2",
+//                "-crf", "23", "-b:v", "1200k", "-strict", "-2", "-threads", Runtime.getRuntime().availableProcessors() - 1 + "",
+//                file.getParent() + "/out_" + file.getName() + ".webm"
+//        };
+
+        Intent intent = new Intent(context, CompressService.class);
+        intent.setAction(CompressService.ACTION_COMPRESS_VID);
+        intent.putExtra(CompressService.EXTRA_VID_CMD, convertCmdx264);
+        context.startService(intent);
+    }
+
+    public static String getEncodingPreset(int id){
+        switch (id){
+            case R.id.rb_slow:
+                return "slow";
+            case R.id.rb_fast:
+                return "fast";
+            case R.id.rb_veryFast:
+                return "veryfast";
+            case R.id.rb_ultraFast:
+                return "ultrafast";
+            default:
+                return "veryfast";
+        }
     }
 
 
