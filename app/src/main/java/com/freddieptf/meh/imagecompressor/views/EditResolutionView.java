@@ -44,7 +44,7 @@ public class EditResolutionView extends LinearLayout {
         width.setText(w + "");
         factor = (float) h / (float) w;
         link = true;
-        linkHeightWidth();
+        linkHeightWidth(true);
     }
 
     public int getResHeight(){
@@ -63,7 +63,9 @@ public class EditResolutionView extends LinearLayout {
         width.setText(w);
     }
 
-    private void linkHeightWidth(){
+    private void linkHeightWidth(boolean link){
+        height.removeTextChangedListener(heightTextWatcher);
+        width.removeTextChangedListener(widthTextWatcher);
         if(link) {
             heightTextWatcher = new HeightTextWatcher();
             widthTextWatcher = new WidthTextWatcher();
@@ -73,6 +75,7 @@ public class EditResolutionView extends LinearLayout {
     }
 
     public  void saveState(Bundle state){
+        linkHeightWidth(false);
         state.putBoolean("k", link);
         state.putFloat("f", factor);
     }
@@ -80,7 +83,7 @@ public class EditResolutionView extends LinearLayout {
     public void restoreState(Bundle state){
         if(state.containsKey("f")) factor = state.getFloat("f");
         if(state.containsKey("k")) link = state.getBoolean("k");
-        if(link) linkHeightWidth();
+        linkHeightWidth(link);
     }
 
     private class HeightTextWatcher implements TextWatcher {
