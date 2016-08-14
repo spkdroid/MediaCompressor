@@ -3,83 +3,121 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:id="@+id/parent"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:animateLayoutChanges="true">
+        android:layout_height="match_parent">
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="8dp">
+        <LinearLayout
+            android:id="@+id/parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/expanded_toolbar"
+            android:paddingTop="16dp"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:paddingBottom="156dp">
+
+
+            <com.freddieptf.meh.imagecompressor.views.TaskView
+                android:id="@+id/taskViewScale"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:tag="scale"
+                app:taskTitle="Scaling">
+
+                <include layout="@layout/layout_vid_scaling" />
+
+
+            </com.freddieptf.meh.imagecompressor.views.TaskView>
+
+            <com.freddieptf.meh.imagecompressor.views.TaskView
+                android:id="@+id/taskViewConvert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:tag="convert"
+                app:taskTitle="Conversion">
+
+                <include layout="@layout/layout_vid_conversion" />
+
+            </com.freddieptf.meh.imagecompressor.views.TaskView>
+
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/iv_thumbnail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:minHeight="48dp"
-                android:minWidth="48dp" />
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                android:layout_gravity="center" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:background="?colorPrimary"
+                android:alpha="0.7"
+                android:elevation="4dp"
+                app:navigationIcon="@drawable/ic_arrow_back_24dp"
+                app:theme="@style/ThemeOverlay.AppCompat.Light">
 
-                <TextView
-                    android:id="@+id/tv_videoName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_videoResolution"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
+                        android:layout_width="match_parent"
+                        android:layout_height="?actionBarSize"
+                        android:gravity="center_vertical"
+                        android:text="Media Compress-uh" />
 
-                <TextView
-                    android:id="@+id/tv_videoDuration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/tv_videoName"
+                        style="@style/TextAppearance.AppCompat.Medium.Inverse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
-                <TextView
-                    android:id="@+id/tv_videoSize"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/tv_videoResolution"
+                        style="@style/TextAppearance.AppCompat.Medium.Inverse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
+                    <TextView
+                        android:id="@+id/tv_videoDuration"
+                        style="@style/TextAppearance.AppCompat.Medium.Inverse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/tv_videoSize"
+                        style="@style/TextAppearance.AppCompat.Medium.Inverse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
-        </TableRow>
-
-        <com.freddieptf.meh.imagecompressor.views.TaskView
-            android:id="@+id/taskViewScale"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:taskTitle="Scaling">
-
-            <include layout="@layout/layout_vid_scaling" />
-
-
-        </com.freddieptf.meh.imagecompressor.views.TaskView>
-
-        <com.freddieptf.meh.imagecompressor.views.TaskView
-            android:id="@+id/taskViewConvert"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:taskTitle="Conversion">
-
-            <include layout="@layout/layout_vid_conversion" />
-
-        </com.freddieptf.meh.imagecompressor.views.TaskView>
+                </LinearLayout>
 
 
-    </LinearLayout>
+            </android.support.v7.widget.Toolbar>
 
+        </FrameLayout>
+
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -89,7 +127,8 @@
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
         app:fabSize="normal"
-        app:srcCompat="@drawable/ic_check_24dp" />
+        app:srcCompat="@drawable/ic_check_24dp"
+        android:onClick="onFabClick"/>
 
 
 </android.support.design.widget.CoordinatorLayout>
