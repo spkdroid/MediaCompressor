@@ -75,7 +75,7 @@ public class CameraActionHandlerService extends Service {
 
     private void initPicService(Intent intent) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("Image Compressor")
+        builder.setContentTitle(getString(R.string.app_name))
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentText("Expand to view compress options");
 
