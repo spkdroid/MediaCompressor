@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.freddieptf.meh.imagecompressor.services.CameraActionHandlerService;
 import com.freddieptf.meh.imagecompressor.services.CompressService;
@@ -22,10 +23,10 @@ import com.freddieptf.meh.imagecompressor.views.EditResolutionView;
 /**
  * Created by freddieptf on 18/07/16.
  */
-public class CompressPicActivity extends AppCompatActivity {
+public class CompressPicActivity extends AppCompatActivity{
 
     SeekBar seekBar;
-    TextView tvQuality, tvDetailText, tvDone;
+    TextView tvQuality, tvDetailText;
     EditResolutionView resolutionView;
     ProgressBar progressBar;
     String[] picPaths;
@@ -48,7 +49,6 @@ public class CompressPicActivity extends AppCompatActivity {
         seekBar        = (SeekBar) findViewById(R.id.seekbar_quality);
         tvQuality      = (TextView) findViewById(R.id.tv_quality);
         tvDetailText   = (TextView)findViewById(R.id.tv_detailText);
-        tvDone         = (TextView) findViewById(R.id.tvDone);
         progressBar    = (ProgressBar) findViewById(R.id.progress);
 
         if(savedInstanceState != null && savedInstanceState.containsKey(CameraActionHandlerService.PIC_PATH)){
@@ -58,6 +58,7 @@ public class CompressPicActivity extends AppCompatActivity {
             targetWidth  = savedInstanceState.getInt(TARGET_WIDTH);
             targetHeight = savedInstanceState.getInt(TARGET_HEIGHT);
             resolutionView.setResolution(targetWidth, targetHeight);
+            tvDetailText.setVisibility(savedInstanceState.getBoolean("dtv") ? View.VISIBLE : View.GONE);
         }else {
             init(getIntent());
         }
@@ -67,7 +68,9 @@ public class CompressPicActivity extends AppCompatActivity {
     private void init(Intent intent) {
         picPaths = intent.getStringArrayExtra(CameraActionHandlerService.PIC_PATH);
         Log.d(TAG, "init: " + picPaths.length);
-        if(picPaths.length > 1) tvDetailText.setText(R.string.compress_multiple_images_message);
+        if(picPaths.length > 1){
+            tvDetailText.setVisibility(View.VISIBLE);
+        }
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(picPaths[0], options);
@@ -95,6 +98,7 @@ public class CompressPicActivity extends AppCompatActivity {
             outState.putInt(TARGET_WIDTH,  resolutionView.getResWidth());
             outState.putInt(TARGET_HEIGHT, resolutionView.getResHeight());
         }
+        outState.putBoolean("dtv", tvDetailText.getVisibility() == View.VISIBLE);
     }
 
     @Override
@@ -134,7 +138,6 @@ public class CompressPicActivity extends AppCompatActivity {
 
     public void compress(View view){
         progressBar.setVisibility(View.VISIBLE);
-        tvDone.setText("");
 
         targetWidth = resolutionView.getResWidth();
         targetHeight = resolutionView.getResHeight();
@@ -156,7 +159,7 @@ public class CompressPicActivity extends AppCompatActivity {
             progressBar.setIndeterminate(false);
             progressBar.setVisibility(View.GONE);
             int i = intent.getIntExtra("num_pics", -1);
-            tvDone.setText(i == -1 ? "Failed" : i + " compressed");
+            Toast.makeText(context, "Success: " + i + " pics compressed!", Toast.LENGTH_LONG).show();
         }
     };
 }

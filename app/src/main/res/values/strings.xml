@@ -3,11 +3,12 @@
     <string name="compressed_image_message">The compressed Image will be saved in the same directory
         as the original image with \'compressed\' appended to the start of its name</string>
     <string name="compress_image">Compress Image</string>
-    <string name="compress_multiple_images_message">Since you\'re trying to compress/resize more than one image,
-        It\'d be wise to make sure the selected images are at-least of the same size before going on.
+    <string name="compress_multiple_images_message">Since you\'re trying to resize and compress more than one image,
+        It\'d be wise to make sure the selected images are at-least of the same size.
         The size below is extracted from the first image only and will be applied to all the selected images</string>
     <string name="a_slower_preset_will_provide_better_compression_compression_is_quality_per_filesize_but_take_more_time">A slower preset will provide better compression (compression is quality per filesize) but take more time!</string>
     <string name="a_lower_value_is_a_higher_quality_and_a_subjectively_sane_range_is_18_28">A lower value is a higher quality and a subjectively sane range is 18-28.</string>
+    <string name="image_compressor">Image Compressor</string>
     <string-array name="formats">
         <item>mkv</item>
         <item>avi</item>
