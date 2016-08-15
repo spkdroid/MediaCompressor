@@ -14,7 +14,7 @@
         android:gravity="center_vertical"
         android:paddingTop="8dp">
 
-        <CheckBox
+        <RadioButton
             android:id="@+id/taskCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
