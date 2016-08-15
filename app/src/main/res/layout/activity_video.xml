@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -15,6 +15,8 @@
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/expanded_toolbar"
             android:paddingTop="16dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
             android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:paddingBottom="156dp">
@@ -69,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 android:background="?colorPrimary"
-                android:alpha="0.7"
+                android:alpha="0.8"
                 android:elevation="4dp"
                 app:navigationIcon="@drawable/ic_arrow_back_24dp"
                 app:theme="@style/ThemeOverlay.AppCompat.Light">
@@ -77,6 +79,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="8dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -84,6 +87,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="?actionBarSize"
                         android:gravity="center_vertical"
+                        android:layout_gravity="top"
                         android:text="Media Compress-uh" />
 
                     <TextView
@@ -118,6 +122,48 @@
         </FrameLayout>
 
     </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomSheet"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:behavior_peekHeight="@dimen/min_task_height"
+        app:behavior_hideable="true"
+        android:background="@color/dark_gray"
+        android:orientation="vertical">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/min_task_height"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_taskStatus"
+                style="@style/TextAppearance.AppCompat.Title.Inverse"
+                android:textColor="@color/gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Starting Tasks..."/>
+
+            <ProgressBar
+                android:id="@+id/pb_tasks"
+                android:layout_gravity="right"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:indeterminate="true" />
+
+        </TableRow>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerTaskStatus"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
