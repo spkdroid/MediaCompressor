@@ -21,8 +21,7 @@
         </activity>
 
         <activity android:name=".CompressPicActivity"
-            android:label="@string/compress_image"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:theme="@style/AppTheme.Dialog"
             android:launchMode="singleTask"
             android:excludeFromRecents="true"/>
 
