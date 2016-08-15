@@ -26,6 +26,7 @@ public class CompressService extends IntentService {
     public static final String EXTRA_VID_CMD        = "pic_paths";
     public static final String EXTRA_QUALITY        = "pic_quality";
     public static final String PROGRESS_UPDATE      = "progress_update";
+    public static final String TASK_SUCCESS         = "success";
     public static final String ACTION_COMPRESS_PIC  = "compress_pic";
     public static final String ACTION_COMPRESS_VID  = "compress_vid";
 
@@ -67,20 +68,21 @@ public class CompressService extends IntentService {
                 case ACTION_COMPRESS_VID:
                     Log.d(TAG, ACTION_COMPRESS_VID);
                     String[] command = intent.getStringArrayExtra(EXTRA_VID_CMD);
-
+                    final Intent progressIntent = new Intent(PROGRESS_UPDATE);
                     try {
                         CompressUtils.compressVid(this, command, new FFmpegExecuteResponseHandler() {
                             @Override
                             public void onSuccess(String message) {
                                 Toast.makeText(getBaseContext(), "Success", Toast.LENGTH_LONG).show();
+                                progressIntent.putExtra(TASK_SUCCESS, true);
+                                LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(progressIntent);
                                 FFmpeg.getInstance(getBaseContext()).killRunningProcesses();
                             }
 
                             @Override
                             public void onProgress(String message) {
-                                Intent i = new Intent(PROGRESS_UPDATE);
-                                i.putExtra(PROGRESS_UPDATE, message);
-                                LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(i);
+                                progressIntent.putExtra(PROGRESS_UPDATE, message);
+                                LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(progressIntent);
                             }
 
                             @Override
@@ -95,7 +97,6 @@ public class CompressService extends IntentService {
 
                             @Override
                             public void onFinish() {
-                                Toast.makeText(getBaseContext(), "ffmpeg finish.", Toast.LENGTH_LONG).show();
                                 FFmpeg.getInstance(getBaseContext()).killRunningProcesses();
                             }
                         });
